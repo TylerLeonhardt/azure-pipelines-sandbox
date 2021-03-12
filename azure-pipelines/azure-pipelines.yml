@@ -7,6 +7,7 @@ stages:
         steps:
           - pwsh: '1..1000 | % { New-Item "./$_.txt" -ItemType File -Value $_ } | % { Write-Host "##vso[artifact.upload artifactname=uploadedresult;]$($_.FullName)" }'
   - stage:
+    dependsOn: []
     displayName: ConsumerStage
     jobs:
       - job:
