@@ -1,0 +1,19 @@
+stages:
+  - stage:
+    displayName: UploaderStage
+    jobs:
+      - job:
+        displayName: UploaderJob
+        steps:
+          - pwsh: '1..1000 | % { New-Item "./$_.txt" -ItemType File -Value $_ } | % { Write-Host "##vso[artifact.upload artifactname=uploadedresult;]$($_.FullName)" }'
+  - stage:
+    displayName: ConsumerStage
+    jobs:
+      - job:
+        displayName: ConsumerJob
+        steps:
+          - pwsh: 'Start-Sleep -Seconds 2'
+          - download: uploadedresult
+          - pwsh: 'gci -rec $(Pipelines.Workspace)/uploadedresult'
+          - pwsh: '1..1000 | % { Start-Sleep -Seconds 1; (gci -rec $(Pipelines.Workspace)/uploadedresult) | measure )}'
+          - pwsh: 'gci -rec $(Pipelines.Workspace)/uploadedresult'
