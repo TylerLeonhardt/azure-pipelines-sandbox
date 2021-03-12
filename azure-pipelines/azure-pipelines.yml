@@ -13,7 +13,7 @@ stages:
       - job:
         displayName: ConsumerJob
         steps:
-          - pwsh: 'Start-Sleep -Seconds 17'
+          - pwsh: 'Start-Sleep -Seconds 25'
           - download: current
             artifact: uploadedresult
           - pwsh: 'gci -rec $(Pipelines.Workspace)/uploadedresult'
