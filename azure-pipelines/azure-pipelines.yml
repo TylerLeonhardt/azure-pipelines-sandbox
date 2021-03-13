@@ -5,7 +5,7 @@ stages:
       - job:
         displayName: UploaderJob
         steps:
-          - pwsh: '1..1000 | % { New-Item "$(Pipeline.Workspace)/$_.txt" -ItemType File -Value $_ } | % { Write-Host "##vso[artifact.upload artifactname=uploadedresult;]$($_.FullName)" }'
+          - pwsh: '1..1000 | % { New-Item "$(Pipeline.Workspace)/$_.txt" -ItemType File -Value $_ } | % { Write-Host "##vso[task.addattachment type=myattachmenttype;name=$($_.Name);]$($_.FullName)" }'
   - stage:
     dependsOn: []
     displayName: ConsumerStage
@@ -16,8 +16,8 @@ stages:
           - pwsh: |
               Start-Sleep -Seconds 25
               1..100 | % {
-                $res = irm "https://dev.azure.com/TylerLeonhardt/Azure%20Pipelines%20Playground/_apis/build/builds/$(Build.BuildId)/artifacts?api-version=6.1-preview.5&artifactName=uploadedresult" -Headers @{ Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN" }
-                $res.resource.properties.artifactsize
+                $res = irm "https://dev.azure.com/TylerLeonhardt/Azure%20Pipelines%20Playground/_apis/build/builds/$(Build.BuildId)/attachments/myattachmenttype?api-version=6.1-preview.2" -Headers @{ Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN" }
+                $res | measure
                 Start-Sleep -Seconds 1
               }
             env:
