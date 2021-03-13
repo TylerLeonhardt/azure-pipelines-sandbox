@@ -13,11 +13,7 @@ stages:
       - job:
         displayName: ConsumerJob
         steps:
-          - pwsh: 'Start-Sleep -Seconds 25'
-          - pwsh: 'gci -rec $env:PIPELINE_WORKSPACE/..'
-          - download: current
-            artifact: uploadedresult
-          - pwsh: 'gci -rec $(Pipeline.Workspace)/..'
-          - pwsh: 'gci -rec $(Pipeline.Workspace)/uploadedresult'
-          - pwsh: '1..1000 | % { Start-Sleep -Seconds 1; (gci -rec $(Pipeline.Workspace)/uploadedresult) | measure )}'
-          - pwsh: 'gci -rec $(Pipeline.Workspace)/uploadedresult'
+          - pwsh: 'Start-Sleep -Seconds 25; 1..100 | % { irm "https://dev.azure.com/TylerLeonhardt/Azure%20Pipelines%20Playground/_apis/build/builds/$(Build.BuildId)/artifacts?api-version=6.1-preview.5" -Headers @{ Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN" } | measure }'
+            env:
+              SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+
