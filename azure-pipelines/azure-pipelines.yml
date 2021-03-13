@@ -19,7 +19,6 @@ stages:
         displayName: ConsumerJob
         steps:
           - pwsh: |
-              Start-Sleep -Seconds 25
               1..100 | % {
                 $res = irm "https://dev.azure.com/TylerLeonhardt/Azure%20Pipelines%20Playground/_apis/build/builds/$(Build.BuildId)/attachments/myattachmenttype?api-version=6.1-preview.2" -Headers @{ Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN" }
                 $res
