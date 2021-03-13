@@ -13,7 +13,7 @@ stages:
       - job:
         displayName: ConsumerJob
         steps:
-          - pwsh: 'Start-Sleep -Seconds 25; 1..100 | % { irm "https://dev.azure.com/TylerLeonhardt/Azure%20Pipelines%20Playground/_apis/build/builds/$(Build.BuildId)/artifacts?api-version=6.1-preview.5" -Headers @{ Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN" } | measure }'
+          - pwsh: 'Start-Sleep -Seconds 25; irm "https://dev.azure.com/TylerLeonhardt/Azure%20Pipelines%20Playground/_apis/build/builds/$(Build.BuildId)/artifacts?api-version=6.1-preview.5&artifactName=uploadedresult" -Headers @{ Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN" } | ConvertTo-Json'
             env:
               SYSTEM_ACCESSTOKEN: $(System.AccessToken)
 
