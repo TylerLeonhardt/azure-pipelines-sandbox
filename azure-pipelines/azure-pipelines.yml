@@ -9,7 +9,7 @@ stages:
               1..1000 | % {
                 $itemCreated = New-Item "$(Pipeline.Workspace)/$_.txt" -ItemType File -Value $_
                 Write-Host "task.addattachment; type=myattachmenttype; name=$_; $($itemCreated.FullName)"
-                Write-Host "##vso[task.addattachment type=myattachmenttype; name=$_;]$($itemCreated.FullName)"
+                Write-Host "##vso[task.addattachment type=myattachmenttype; name=file$_;]$($itemCreated.FullName)"
               }
   - stage:
     dependsOn: []
