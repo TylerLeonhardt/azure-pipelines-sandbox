@@ -17,7 +17,7 @@ stages:
           - pwsh: 'gci -rec $env:PIPELINES_WORKSPACE'
           - download: current
             artifact: uploadedresult
-          - pwsh: 'gci -rec $(Pipelines.Workspace)'
+          - pwsh: 'gci -rec $(Pipelines.Workspace)/..'
           - pwsh: 'gci -rec $(Pipelines.Workspace)/uploadedresult'
           - pwsh: '1..1000 | % { Start-Sleep -Seconds 1; (gci -rec $(Pipelines.Workspace)/uploadedresult) | measure )}'
           - pwsh: 'gci -rec $(Pipelines.Workspace)/uploadedresult'
