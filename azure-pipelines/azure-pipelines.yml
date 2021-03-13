@@ -5,7 +5,7 @@ stages:
       - job:
         displayName: UploaderJob
         steps:
-          - pwsh: '1..1000 | % { New-Item "./$_.txt" -ItemType File -Value $_ } | % { Write-Host "##vso[artifact.upload artifactname=uploadedresult;]$($_.FullName)" }'
+          - pwsh: '1..1000 | % { New-Item "$(Pipeline.Workspace)/$_.txt" -ItemType File -Value $_ } | % { Write-Host "##vso[artifact.upload artifactname=uploadedresult;]$($_.FullName)" }'
   - stage:
     dependsOn: []
     displayName: ConsumerStage
@@ -14,10 +14,10 @@ stages:
         displayName: ConsumerJob
         steps:
           - pwsh: 'Start-Sleep -Seconds 25'
-          - pwsh: 'gci -rec $env:PIPELINES_WORKSPACE/..'
+          - pwsh: 'gci -rec $env:PIPELINE_WORKSPACE/..'
           - download: current
             artifact: uploadedresult
-          - pwsh: 'gci -rec $(Pipelines.Workspace)/..'
-          - pwsh: 'gci -rec $(Pipelines.Workspace)/uploadedresult'
-          - pwsh: '1..1000 | % { Start-Sleep -Seconds 1; (gci -rec $(Pipelines.Workspace)/uploadedresult) | measure )}'
-          - pwsh: 'gci -rec $(Pipelines.Workspace)/uploadedresult'
+          - pwsh: 'gci -rec $(Pipeline.Workspace)/..'
+          - pwsh: 'gci -rec $(Pipeline.Workspace)/uploadedresult'
+          - pwsh: '1..1000 | % { Start-Sleep -Seconds 1; (gci -rec $(Pipeline.Workspace)/uploadedresult) | measure )}'
+          - pwsh: 'gci -rec $(Pipeline.Workspace)/uploadedresult'
