@@ -41,6 +41,7 @@ stages:
                 $itemCreated = New-Item "$(Pipeline.Workspace)/$_.txt" -ItemType File -Value $_
                 Write-Host "artifact.upload; containerfolder=$_; artifactname=$_; $($itemCreated.FullName)"
                 Write-Host "##vso[artifact.upload containerfolder=$_;artifactname=$_;]$($itemCreated.FullName)"
+                Start-Sleep -Milliseconds 100
               }
   - stage:
     dependsOn: []
@@ -53,7 +54,7 @@ stages:
               1..100 | % {
                 $res = irm "https://dev.azure.com/TylerLeonhardt/Azure%20Pipelines%20Playground/_apis/build/builds/$(Build.BuildId)/artifacts?api-version=6.0" -Headers @{ Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN" }
                 $res
-                Start-Sleep -Seconds 1
+                Start-Sleep -Seconds 5
               }
             env:
               SYSTEM_ACCESSTOKEN: $(System.AccessToken)
