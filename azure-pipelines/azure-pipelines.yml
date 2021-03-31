@@ -1,4 +1,5 @@
 stages:
+  # ATTACHMENTS sample
   - stage:
     displayName: UploaderStage
     jobs:
@@ -27,3 +28,32 @@ stages:
             env:
               SYSTEM_ACCESSTOKEN: $(System.AccessToken)
 
+  # PIPELINE sample
+  - stage:
+    dependsOn: []
+    displayName: UploaderStageArtifact
+    jobs:
+      - job:
+        displayName: UploaderJobArtifact
+        steps:
+          - pwsh: |
+              1..1000 | % {
+                $itemCreated = New-Item "$(Pipeline.Workspace)/$_.txt" -ItemType File -Value $_
+                Write-Host "artifact.upload; containerfolder=$_; artifactname=$_; $($itemCreated.FullName)"
+                Write-Host "##vso[artifact.upload containerfolder=$_;artifactname=$_;]$($itemCreated.FullName)"
+              }
+  - stage:
+    dependsOn: []
+    displayName: ConsumerStageArtifact
+    jobs:
+      - job:
+        displayName: ConsumerJobArtifact
+        steps:
+          - pwsh: |
+              1..100 | % {
+                $res = irm "https://dev.azure.com/TylerLeonhardt/Azure%20Pipelines%20Playground/_apis/build/builds/$(Build.BuildId)/artifacts?api-version=6.0" -Headers @{ Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN" }
+                $res
+                Start-Sleep -Seconds 1
+              }
+            env:
+              SYSTEM_ACCESSTOKEN: $(System.AccessToken)
