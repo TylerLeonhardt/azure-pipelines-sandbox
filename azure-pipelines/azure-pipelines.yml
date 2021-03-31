@@ -43,6 +43,10 @@ stages:
                 Write-Host "##vso[artifact.upload containerfolder=$_;artifactname=$_;]$($itemCreated.FullName)"
                 Start-Sleep -Milliseconds 100
               }
+          - publish: $(Pipeline.Workspace)/1.txt
+            artifact: 1ALT
+          - publish: $(Pipeline.Workspace)/2.txt
+            artifact: 2ALT
   - stage:
     dependsOn: []
     displayName: ConsumerStageArtifact
