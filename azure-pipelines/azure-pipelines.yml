@@ -61,8 +61,9 @@ stages:
                 $res = irm "https://dev.azure.com/TylerLeonhardt/Azure%20Pipelines%20Playground/_apis/build/builds/$(Build.BuildId)/artifacts?api-version=6.0" -Headers @{ Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN" }
                 $res
                 Start-Sleep -Seconds 5
-                $query = "?branchName=$(Build.SourceBranchName)&stageName=UploaderStageArtifact&api-version=6.1-preview.1"
-                irm "https://dev.azure.com/TylerLeonhardt/Azure%20Pipelines%20Playground/_apis/build/status/$(Build.DefinitionName)$query" -Headers @{ Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN" }
+                $lol = irm "https://dev.azure.com/TylerLeonhardt/Azure%20Pipelines%20Playground/_apis/build/builds/$(Build.BuildId)/timeline/?api-version=6.0" -Headers @{ Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN" }
+                $lol | ConvertTo-Json -Depth 100
+
               }
             env:
               SYSTEM_ACCESSTOKEN: $(System.AccessToken)
