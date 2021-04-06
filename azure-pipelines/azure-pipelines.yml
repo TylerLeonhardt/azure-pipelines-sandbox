@@ -1,8 +1,5 @@
 stages:
   - stage:
-    variables:
-      - name: BUILDS_API_URL
-        value: $(System.CollectionUri)$(System.TeamProject)/_apis/build/builds/$(Build.BuildId)/
     dependsOn: []
     displayName: UploaderStageArtifact
     jobs:
@@ -21,6 +18,9 @@ stages:
           - publish: $(Pipeline.Workspace)/2.txt
             artifact: 2ALT
   - stage:
+    variables:
+      - name: BUILDS_API_URL
+        value: $(System.CollectionUri)$(System.TeamProject)/_apis/build/builds/$(Build.BuildId)/
     dependsOn: []
     displayName: ConsumerStageArtifact
     jobs:
