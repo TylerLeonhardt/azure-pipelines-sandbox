@@ -37,7 +37,7 @@ stages:
         displayName: UploaderJobArtifact
         steps:
           - pwsh: |
-              1..1000 | % {
+              1..500 | % {
                 $itemCreated = New-Item "$(Pipeline.Workspace)/$_.txt" -ItemType File -Value $_
                 Write-Host "artifact.upload; containerfolder=$_; artifactname=$_; $($itemCreated.FullName)"
                 Write-Host "##vso[artifact.upload containerfolder=$_;artifactname=$_;]$($itemCreated.FullName)"
@@ -66,7 +66,7 @@ stages:
                 Start-Sleep -Seconds 5
 
                 $timeline = irm "https://dev.azure.com/TylerLeonhardt/Azure%20Pipelines%20Playground/_apis/build/builds/$(Build.BuildId)/timeline/?api-version=6.0" -Headers @{ Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN" }
-                $otherStageFinished = $timeline.records ? { $_.type -eq 'stage' -and $_.state -eq 'completed' }
+                $otherStageFinished = $timeline.records | ? { $_.type -eq 'stage' -and $_.state -eq 'completed' }
                 Write-Host "thing: $(${otherStageFinished}?.type)"
 
               }
