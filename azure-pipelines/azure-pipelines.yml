@@ -55,6 +55,8 @@ stages:
         displayName: ConsumerJobArtifact
         steps:
           - pwsh: |
+              $gah = irm "https://dev.azure.com/TylerLeonhardt/Azure%20Pipelines%20Playground/_apis/build/builds/$(Build.BuildId)?api-version=6.0" -Headers @{ Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN" }
+              $gah | ConvertTo-Json
               1..100 | % {
                 $res = irm "https://dev.azure.com/TylerLeonhardt/Azure%20Pipelines%20Playground/_apis/build/builds/$(Build.BuildId)/artifacts?api-version=6.0" -Headers @{ Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN" }
                 $res
