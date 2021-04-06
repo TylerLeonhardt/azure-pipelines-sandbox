@@ -1,35 +1,8 @@
 stages:
-  # ATTACHMENTS sample
   - stage:
-    displayName: UploaderStage
-    jobs:
-      - job:
-        displayName: UploaderJob
-        steps:
-          - pwsh: |
-              1..1000 | % {
-                $itemCreated = New-Item "$(Pipeline.Workspace)/$_.txt" -ItemType File -Value $_
-                Write-Host "task.addattachment; type=myattachmenttype; name=$_; $($itemCreated.FullName)"
-                Write-Host "##vso[task.addattachment type=myattachmenttype;name=$_;]$($itemCreated.FullName)"
-              }
-  - stage:
-    dependsOn: []
-    displayName: ConsumerStage
-    jobs:
-      - job:
-        displayName: ConsumerJob
-        steps:
-          - pwsh: |
-              1..100 | % {
-                $res = irm "https://dev.azure.com/TylerLeonhardt/Azure%20Pipelines%20Playground/_apis/build/builds/$(Build.BuildId)/attachments/myattachmenttype?api-version=6.1-preview.2" -Headers @{ Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN" }
-                $res
-                Start-Sleep -Seconds 1
-              }
-            env:
-              SYSTEM_ACCESSTOKEN: $(System.AccessToken)
-
-  # PIPELINE sample
-  - stage:
+    variables:
+      - name: BUILDS_API_URL
+        value: $(System.CollectionUri)$(System.TeamProject)/_apis/build/builds/$(Build.BuildId)/
     dependsOn: []
     displayName: UploaderStageArtifact
     jobs:
@@ -55,20 +28,14 @@ stages:
         displayName: ConsumerJobArtifact
         steps:
           - pwsh: |
-              $gah = irm "https://dev.azure.com/TylerLeonhardt/Azure%20Pipelines%20Playground/_apis/build/builds/$(Build.BuildId)?api-version=6.0" -Headers @{ Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN" }
-              $gah | ConvertTo-Json
-
-              $timeline = irm "https://dev.azure.com/TylerLeonhardt/Azure%20Pipelines%20Playground/_apis/build/builds/$(Build.BuildId)/timeline/?api-version=6.0" -Headers @{ Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN" }
-              $otherStageFinished = $timeline.records | ? { $_.type -eq 'stage' -and $_.state -eq 'completed' }
-              while (!$otherStageFinished) {
-                $res = irm "https://dev.azure.com/TylerLeonhardt/Azure%20Pipelines%20Playground/_apis/build/builds/$(Build.BuildId)/artifacts?api-version=6.0" -Headers @{ Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN" }
+              do {
+                $res = irm "$(BUILDS_API_URL)artifacts?api-version=6.0" -Headers @{ Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN" }
                 $res
                 Start-Sleep -Seconds 5
 
-                $timeline = irm "https://dev.azure.com/TylerLeonhardt/Azure%20Pipelines%20Playground/_apis/build/builds/$(Build.BuildId)/timeline/?api-version=6.0" -Headers @{ Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN" }
+                $timeline = irm "$(BUILDS_API_URL)timeline?api-version=6.0" -Headers @{ Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN" }
                 $otherStageFinished = $timeline.records | ? { $_.type -eq 'stage' -and $_.state -eq 'completed' }
                 Write-Host "thing: $(${otherStageFinished}?.type)"
-
-              }
+              } while (!$otherStageFinished)
             env:
               SYSTEM_ACCESSTOKEN: $(System.AccessToken)
