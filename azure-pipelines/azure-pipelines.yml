@@ -59,7 +59,7 @@ stages:
               $gah | ConvertTo-Json
 
               $timeline = irm "https://dev.azure.com/TylerLeonhardt/Azure%20Pipelines%20Playground/_apis/build/builds/$(Build.BuildId)/timeline/?api-version=6.0" -Headers @{ Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN" }
-              $otherStageFinished = $timeline.records ? { $_.type -eq 'stage' -and $_.state -eq 'completed' }
+              $otherStageFinished = $timeline.records | ? { $_.type -eq 'stage' -and $_.state -eq 'completed' }
               while (!$otherStageFinished) {
                 $res = irm "https://dev.azure.com/TylerLeonhardt/Azure%20Pipelines%20Playground/_apis/build/builds/$(Build.BuildId)/artifacts?api-version=6.0" -Headers @{ Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN" }
                 $res
