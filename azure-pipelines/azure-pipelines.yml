@@ -29,13 +29,18 @@ stages:
         steps:
           - pwsh: |
               do {
-                $res = irm "$(BUILDS_API_URL)artifacts?api-version=6.0" -Headers @{ Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN" }
-                $res
                 Start-Sleep -Seconds 5
 
-                $timeline = irm "$(BUILDS_API_URL)timeline?api-version=6.0" -Headers @{ Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN" }
-                $otherStageFinished = $timeline.records | ? { $_.type -eq 'stage' -and $_.state -eq 'completed' }
-                Write-Host "thing: $(${otherStageFinished}?.type)"
+                # Will print out how many we have
+                $res = Invoke-RestMethod "$(BUILDS_API_URL)artifacts?api-version=6.0" -Headers @{ Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN" }
+                $res
+                
+                # Get the timeline and see if it says the other stage completed
+                $timeline = Invoke-RestMethod "$(BUILDS_API_URL)timeline?api-version=6.0" -Headers @{ Authorization = "Bearer $env:SYSTEM_ACCESSTOKEN" }
+                $otherStageFinished = $timeline.records | Where-Object { $_.type -eq 'stage' -and $_.state -eq 'completed' }
+                Write-Host "Completed: $(${otherStageFinished}?.type ? 'yes' : 'no')"
+                
+                # While the other stage is still running
               } while (!$otherStageFinished)
             env:
               SYSTEM_ACCESSTOKEN: $(System.AccessToken)
